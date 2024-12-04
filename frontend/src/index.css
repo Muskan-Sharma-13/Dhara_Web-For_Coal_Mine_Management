@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* 
+@layer utilities {
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;  /* IE and Edge */
+      /* scrollbar-width: none;  Firefox */
+    /* }
+  } */ 
+
+  .glassmorphic-header {
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-color: rgb(22 101 52);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    /* border: 1px solid rgba(255, 255, 255, 0.2); */
+  }
+  
+  .glassmorphic-calendar {
+    
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .glassmorphic-modal {
+    background: rgba(72, 100, 114, 0.66);
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(38, 80, 50, 0.829);
+  }
+  
