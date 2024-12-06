@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+// import { getDatabase,ref,set} from "firebase/database";
+// import { app } from "./firebase";
+
 import { 
   BrowserRouter as Router, 
   Route, 
@@ -32,10 +35,23 @@ import PermissionsPage from './pages/PermissionPage';
 import SchedulerPage from './pages/SchedulerPage';
 import LogSummarizer from './pages/LogSummry';
 
-// import axios from 'axios';
+// const db=getDatabase(app);
+
+// const putData=()=>{
+//   set(ref(db,"users/muskan"),{
+//     id:1,
+//     name:"Muskan",
+//     age: 20,
+//   });
+// };
 
 function handleSubmit() {
-  const formData = { message: 'hello from onboard mine' };
+  const formData =
+    {
+      id:3,
+      name:"Muskan Sharma",
+      age:34,
+    };
     axios.post('http://localhost:3000/api', formData)
         .then((response) => {
             console.log('Response from backend:', response.data);
@@ -49,6 +65,7 @@ function OnboardMineWrapper() {
   // Call handleSubmit with sample data (modify as needed)
   // const formData = { user: 'exampleUser', action: 'onboard' };
   handleSubmit();
+  // putData();
 
   // Render the target component
   return <MineOnboarding />;

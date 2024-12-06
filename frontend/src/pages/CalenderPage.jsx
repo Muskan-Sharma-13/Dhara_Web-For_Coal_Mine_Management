@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -8,47 +8,48 @@ import { Modal, TextField, Button, Chip, MenuItem, Select } from "@mui/material"
 import { NotificationsNone, CalendarToday } from "@mui/icons-material";
 import CalenderImg from "../assets/calender.png";
 import taskdone from "../assets/taskdone.gif";
+import axios from "axios";
 
 const CalendarApp = () => {
     const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(new Date());
   // Dummy data
   const dummyEvents = [
-    {
-      title: "Safety Inspection",
-      start: "2024-12-05",
-      end: "2024-12-06",
-      type: "Maintenance",
-      priority: "high",
-      description: "Check all the workers wear the safety kit",
-      completed: false,
-    },
-    {
-      title: "Equipment Maintenance",
-      start: "2024-12-10",
-      type: "Maintenance",
-      priority: "medium",
-      description: "Perform routine maintenance on all equipment",
-      completed: false,
-    },
-    {
-      title: "Team Meeting",
-      start: "2024-12-15",
-      end: "2024-12-15",
-      type: "Meeting",
-      priority: "low",
-      description: "Discuss quarterly goals and action items",
-      completed: true,
-    },
-    {
-      title: "Quarterly Review",
-      start: "2024-12-20",
-      end: "2024-12-20",
-      type: "Meeting",
-      priority: "high",
-      description: "Review company performance for the quarter",
-      completed: false,
-    },
+    // {
+    //   title: "Safety Inspection",
+    //   start: "2024-12-05",
+    //   end: "2024-12-06",
+    //   type: "Maintenance",
+    //   priority: "high",
+    //   description: "Check all the workers wear the safety kit",
+    //   completed: false,
+    // },
+    // {
+    //   title: "Equipment Maintenance",
+    //   start: "2024-12-10",
+    //   type: "Maintenance",
+    //   priority: "medium",
+    //   description: "Perform routine maintenance on all equipment",
+    //   completed: false,
+    // },
+    // {
+    //   title: "Team Meeting",
+    //   start: "2024-12-15",
+    //   end: "2024-12-15",
+    //   type: "Meeting",
+    //   priority: "low",
+    //   description: "Discuss quarterly goals and action items",
+    //   completed: true,
+    // },
+    // {
+    //   title: "Quarterly Review",
+    //   start: "2024-12-20",
+    //   end: "2024-12-20",
+    //   type: "Meeting",
+    //   priority: "high",
+    //   description: "Review company performance for the quarter",
+    //   completed: false,
+    // },
   ];
   const handleViewNotifications = () => {
     navigate('/app/notifications'); // Navigate to the notifications page when the button is clicked
@@ -132,15 +133,23 @@ const handleDeleteEvent = () => {
     return eventDate.getMonth() === currentMonth;
   });
 
-  const pendingEvents = events.filter((event) => {
-    const today = new Date();
-    const eventDate = new Date(event.start);
-    return (
-      eventDate.getMonth() === currentMonth &&
-      eventDate.getDate() === today.getDate() &&
-      !event.completed
-    );
-  });
+
+const [tasks, setTasks] = useState([]);
+
+useEffect(() => {
+  const pendingEvents = async () => {
+    try {
+      const response = await axios.post('http://localhost:3000/task');
+      console.log('Response from backend:', response.data);
+      setTasks(response.data.tasks || []); 
+    } catch (error) {
+      console.error('Error fetching data from backend:', error);
+    }
+  };
+
+  pendingEvents();
+}, []);
+
 
   const getPriorityColorClass = (priority) => {
     switch (priority) {
@@ -203,17 +212,17 @@ const handleDeleteEvent = () => {
                 Pending Tasks
               </h2>
             </div>
-            {pendingEvents.length > 0 ? (
+            {tasks.length > 0 ? (
               <div className="notifications-list space-y-2">
-                {pendingEvents.map((event, index) => (
+                {tasks.map((task,index) => (
                   <div
                     key={index}
                     className="notification p-2 rounded-lg bg-gray-800 text-white flex items-center justify-between"
                   >
                     <div>
-                      <h3 className="text-lg font-medium">{event.title}</h3>
-                      <p className="text-gray-400">{event.type}</p>
-                      <p className="text-gray-400">{event.description}</p>
+                      <h3 className="text-lg font-medium">{task.title}</h3>
+                      <p className="text-gray-400">{task.type}</p>
+                      <p className="text-gray-400">{task.description}</p>
                     </div>
                     <Button
                       variant="contained"

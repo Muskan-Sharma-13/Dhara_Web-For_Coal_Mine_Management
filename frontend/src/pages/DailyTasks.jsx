@@ -1,4 +1,6 @@
 import React from 'react';
+import { useEffect,useState } from 'react';
+import axios from "axios";
 
 function DailyTasks() {
   const shiftLogs = [
@@ -15,18 +17,27 @@ function DailyTasks() {
     { id: 4, created: '2023-04-12', passedItems: 12, totalItems: 12, status: 'Passed' }
   ];
 
-  const workOrders = [
-    { id: 1, title: 'Equipment Maintenance', status: 'In Progress', assignedTo: 'Alice Williams' },
-    { id: 2, title: 'Safety Inspection', status: 'Pending', assignedTo: 'Bob Johnson' },
-    { id: 3, title: 'Electrical Upgrade', status: 'Completed', assignedTo: 'John Doe' },
-    { id: 4, title: 'Ventilation System Check', status: 'In Progress', assignedTo: 'Jane Smith' }
-  ];
+  const [orders, setOrders] = useState([]);
+    useEffect(() => {
+    const findworkOrders = async () => {
+      try {
+        const response = await axios.post('http://localhost:3000/dailyTask');
+        console.log('Response from backend:', response.data);
+        setOrders(response.data.workOrders || []); 
+      } catch (error) {
+        console.error('Error fetching data from backend:', error);
+      }
+    };
+  
+    findworkOrders();
+  }, []);
 
   const getStatusColor = (status) => {
     switch(status) {
-      case 'Completed': return 'text-green-500';
-      case 'In Progress': return 'text-yellow-500';
-      case 'Pending': return 'text-red-500';
+      case 'Completed': return 'text-blue-500';
+      case 'In Progress': return 'text-green-500';
+      case 'Pending': return 'text-yellow-500';
+      case 'Past Due': return 'text-red-500';
       default: return 'text-gray-500';
     }
   };
@@ -101,11 +112,11 @@ function DailyTasks() {
             </tr>
           </thead>
           <tbody>
-            {workOrders.map((order) => (
-              <tr key={order.id}>
+            {orders.map((order) => (
+              <tr key={order._id}>
                 <td className="p-2">{order.title}</td>
                 <td className={`p-2 ${getStatusColor(order.status)}`}>{order.status}</td>
-                <td className="p-2">{order.assignedTo}</td>
+                <td className="p-2">{order.shiftIncharge}</td>
                 <td className="p-2">
                   <button className="bg-[#286090] hover:bg-[#3b7baa] text-white px-2 py-1 rounded-md mr-2">
                     Details

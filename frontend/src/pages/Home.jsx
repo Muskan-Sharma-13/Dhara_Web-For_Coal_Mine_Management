@@ -1,19 +1,41 @@
 import React from 'react';
-
+import { useState,useEffect } from 'react';
+import axios from 'axios';
+//
 function Home() {
-  const overviewData = {
-    totalMines: 26,
-    activeUsers: 142,
-    openWorkOrders: 18,
-    pendingInspections: 8
-  };
+  const [overviewData, setOverviewData] = useState({
+    totalMines: 0,
+    activeUsers: 0,
+    openWorkOrders: 0,
+    pendingTasks: 0,
+  });
 
   const recentActivity = [
     { id: 1, action: 'New mine onboarded', timestamp: '2023-04-15 10:23 AM' },
     { id: 2, action: 'Safety checklist completed', timestamp: '2023-04-14 3:45 PM' },
     { id: 3, action: 'Equipment maintenance request', timestamp: '2023-04-13 9:12 AM' },
-    { id: 4, action: 'Shift log updated', timestamp: '2023-04-12 6:30 PM' }
+    { id: 4, action: 'Shift log updated', timestamp: '2023-04-12 6:30 PM' },
   ];
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.post('http://localhost:3000/home');
+        // console.log('Response from backend:', response.data);
+        setOverviewData((prev) => ({
+          ...prev,
+          totalMines: response.data.minecount || 0,
+          activeUsers: response.data.member+1 || 1,
+          pendingTasks: response.data.taskcount || 0
+
+        }));
+      } catch (error) {
+        console.error('Error fetching data from backend:', error);
+      }
+    };
+
+    fetchData();
+  }, []); 
 
   return (
     <div className="p-8 text-[#c3c3c3]">
@@ -32,7 +54,7 @@ function Home() {
               <span className="font-medium">Open Work Orders:</span> {overviewData.openWorkOrders}
             </div>
             <div>
-              <span className="font-medium">Pending Inspections:</span> {overviewData.pendingInspections}
+              <span className="font-medium">Pending Tasks:</span> {overviewData.pendingTasks}
             </div>
           </div>
         </div>
