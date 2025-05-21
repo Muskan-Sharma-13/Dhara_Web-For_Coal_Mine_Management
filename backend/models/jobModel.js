@@ -13,17 +13,7 @@ const jobSchema = mongoose.Schema({
     title: String,
     description: String,
     priority: String,
-    start: Date,
     end: Date,
-    createdAt: {
-        type: Date,
-        default: () => {
-            // Use toLocaleString to get the time in IST (UTC +5:30)
-            const options = { timeZone: 'Asia/Kolkata' };
-            const istDate = new Date(new Date().toLocaleString('en-US', options));
-            return istDate;
-        }
-    },
     mineManager: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'mineManager',
@@ -32,6 +22,11 @@ const jobSchema = mongoose.Schema({
     shiftIncharge: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'shiftIncharge',
+        default: null,
+    },
+    team: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'team',
         default: null,
     },
     status: {

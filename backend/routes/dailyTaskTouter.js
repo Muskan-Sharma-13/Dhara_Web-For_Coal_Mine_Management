@@ -4,6 +4,7 @@ const mineManager=require('../models/mineManager');
 const shiftIncharge=require('../models/shiftIncharge');
 // const task=require('../models/taskModel');
 const job=require('../models/jobModel');
+const team=require('../models/teamModel');
 
 
 async function findUser(){
@@ -24,22 +25,31 @@ router.post("/", async (req, res) => {
       const modifiedWorkOrders = await Promise.all(
         workOrders.map(async (work) => {
           // Update the status in the database if the condition is met
-          if (work.end < Date.now()) {
+          if (work.end < Date.now() && work.status!=='Completed') {
             work.status = "Past Due";
             await work.save(); // Persist the status change
           }
-        const options = { timeZone: 'Asia/Kolkata' };
-        const istDate = new Date(new Date().toLocaleString('en-US', options));
+        // const options = { timeZone: 'Asia/Kolkata' };
+        // const istDate = new Date(new Date().toLocaleString('en-US', options));
         // console.log(work.end+','+istDate);
   
           // Convert to plain object for modification without affecting the DB
           const workObj = work.toObject();
   
           // Fetch the name of the shift incharge
-          const inch = await shiftIncharge.findById(work.shiftIncharge);
-          if (inch) {
-            workObj.shiftIncharge = inch.name; // Replace ID with name in response
+          if(work.shiftIncharge!==null){
+            const inch = await shiftIncharge.findById(work.shiftIncharge);
+            if (inch) {
+              workObj.allottedTo = inch.name; // Replace ID with name in response
+            }
+        }
+
+        if(work.team!==null){
+          const temp = await team.findById(work.team);
+          if (temp) {
+            workObj.allottedTo = temp.name; // Replace ID with name in response
           }
+      }
   
           return workObj; // Return modified object for response
         })

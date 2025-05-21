@@ -24,6 +24,7 @@ const sidebarNavigation = [
   { to: '/app/calendar', icon: <EventIcon />, label: 'Calender' },
   { to: '/app/scheduler', icon: <ScheduleOutlinedIcon />, label: 'Scheduler' },
   { to: '/app/summary', icon: <SummarizeIcon />, label: 'Log Summary' },
+  { to: '/app/Iot', icon: <SummarizeIcon />, label: 'Iot' },
   
 ];
 

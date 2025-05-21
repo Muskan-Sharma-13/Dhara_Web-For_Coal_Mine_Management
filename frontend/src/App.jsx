@@ -34,6 +34,7 @@ import CalenderPage from './pages/CalenderPage';
 import PermissionsPage from './pages/PermissionPage';
 import SchedulerPage from './pages/SchedulerPage';
 import LogSummarizer from './pages/LogSummry';
+import Iot from './pages/Iot';
 
 // const db=getDatabase(app);
 
@@ -86,6 +87,7 @@ function MainLayout() {
     if (path.includes('calender')) return 'Calender';
     if (path.includes('schedular')) return 'Schedular';
     if (path.includes('summary')) return 'Log Summary';
+    if (path.includes('Iot')) return 'Iot';
     return 'Home';  // Default to Home
   };
 const toggleSidebar = () => {
@@ -93,7 +95,7 @@ const toggleSidebar = () => {
 };
 
 return (
-  <div className="flex min-h-screen bg-[#121212] text-white ">
+  <div className="flex min-h-screen bg-[#121212] text-white overflow-auto ">
     <div 
       className={`
         fixed left-0 top-0 bottom-0 z-40 
@@ -155,6 +157,7 @@ function App() {
           <Route path="calendar" element={<CalenderPage />} />
           <Route path="scheduler" element={<SchedulerPage />} />
           <Route path="summary" element={<LogSummarizer />} />
+          <Route path="Iot" element={<Iot />} />
         </Route>
         
         {/* Catch-all Route */}

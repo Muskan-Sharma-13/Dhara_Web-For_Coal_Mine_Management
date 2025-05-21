@@ -2,15 +2,19 @@ const express = require('express');
 const app = express();
 const dotenv = require('dotenv');
 const cors = require('cors');
+const axios = require('axios')
 const { db } = require('./firebase'); // Import Firestore instance
 const mineManager=require('./models/mineManager');
 const shiftIncharge=require('./models/shiftIncharge');
 const mine=require('./models/mine');
 const task=require('./models/taskModel');
+const team=require('./models/teamModel');
 const homeRouter=require('./routes/homeRouter');
 const taskRouter=require('./routes/taskRouter');
 const schedulerRouter=require('./routes/schedulerRouter');
 const dailyTaskRouter=require('./routes/dailyTaskTouter');
+const teamRouter=require('./routes/teamRouter');
+const weatherRouter=require('./routes/weatherRouter');
 
 dotenv.config();
 app.use(cors());
@@ -112,6 +116,7 @@ async function findUser(){
 //     res.send('hello');
 // })
 
+
 app.post('/api', async (req, res) => {
   const { id, name, age } = req.body;
 
@@ -158,12 +163,58 @@ app.post('/api', async (req, res) => {
 //     // res.status.json();
 // })
 
+// app.get('/apitest',async(req,res)=>{
+//   await mine.updateOne(
+//     { _id: '6751a97b83a1b1ed77c5f7d5' }, // Find document by its ID
+//     { 
+//       $pull: {
+//         shiftIncharge: { $nin: ['6751a9e99bb03d657f20da92','6751aa0347b2166f7b92f2ef','6751aa0347b2166f7b92f2f5','6754ed87575542ea8289e449'] } // Pull all IDs not in the keepIds array
+//       }
+//     }
+//   );
+//   res.send("hello");
+// })
+
+// app.get('/create-team',async(req,res)=>{
+//   const teams=await team.create({
+//     mineManager:'6751a93a1733504478bf1baf',
+//     name:'Trial Team',
+//     description:'This is a trial team',
+//   }) 
+//   teams.shiftIncharge.push('6751a9e99bb03d657f20da92'),
+//   teams.save();
+//   console.log(teams);
+//   res.send('hello');
+// })
 
 
 app.use("/home",homeRouter);
 app.use("/task",taskRouter);
 app.use("/scheduler",schedulerRouter);
 app.use("/dailyTask",dailyTaskRouter);
+app.use("/team",teamRouter);
+app.use("/weather",weatherRouter);
+
+// app.post('/get-weather-advisory', async (req, res) => {
+//   try {
+//     const city = "Mumbai"; // Hardcoded city value for testing
+//     console.log(`Fetching weather advisory for city: ${city}`);
+
+//     // Send a POST request to the Flask API with the city
+//     const response = await axios.post('http://127.0.0.1:5000/weather/advisory', { city });
+//     console.log(response.data);
+//     // Forward the Flask API's response back to the client
+//     res.status(200).json(response.data);
+//   } catch (error) {
+//     console.error('Error communicating with Flask API:', error.message);
+//     if (error.response) {
+//       // Forward the error response from Flask API
+//       res.status(error.response.status).json(error.response.data);
+//     } else {
+//       res.status(500).json({ error: 'Internal Server Error' });
+//     }
+//   }
+// });
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {

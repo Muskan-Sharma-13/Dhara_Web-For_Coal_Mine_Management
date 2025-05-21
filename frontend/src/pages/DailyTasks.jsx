@@ -116,7 +116,7 @@ function DailyTasks() {
               <tr key={order._id}>
                 <td className="p-2">{order.title}</td>
                 <td className={`p-2 ${getStatusColor(order.status)}`}>{order.status}</td>
-                <td className="p-2">{order.shiftIncharge}</td>
+                <td className="p-2">{order.allottedTo? order.allottedTo:'None'}</td>
                 <td className="p-2">
                   <button className="bg-[#286090] hover:bg-[#3b7baa] text-white px-2 py-1 rounded-md mr-2">
                     Details

@@ -24,8 +24,11 @@ const GlassCard = ({ children }) => {
 const Alert = ({ severity, children }) => {
   const colorClasses = {
     warning: 'bg-yellow-100 text-yellow-800 border-yellow-500',
+    Medium: 'bg-yellow-100 text-yellow-800 border-yellow-500',
     error: 'bg-red-100 text-red-800 border-red-500',
+    High: 'bg-red-100 text-red-800 border-red-500',
     success: 'bg-green-100 text-green-800 border-green-500',
+    Low: 'bg-green-100 text-green-800 border-green-500',
     info: 'bg-blue-100 text-blue-800 border-blue-500',
   };
 
@@ -53,22 +56,25 @@ const WeatherBot = () => {
 
     
   const [weatherData, setWeatherData] = useState(null);
-  const [weatherAlert, setWeatherAlert] = useState(null);
+  //const [weatherAlert, setWeatherAlert] = useState(null);
+  const [error, setError] = useState(null);
 //backend wala part
   useEffect(() => {
     const fetchWeatherData = async () => {
       try {
-        const response = await axios.get('/api/weather');
+        const response = await axios.post('http://localhost:3000/weather');
+        console.log(response.data);
         setWeatherData(response.data);
 
         // Check for weather alerts
-        if (response.data.alerts) {
-          setWeatherAlert(response.data.alerts[0]);
-        } else {
-          setWeatherAlert(null);
-        }
+        // if (response.data.alerts) {
+        //   setWeatherAlert(response.data);
+        // } else {
+        //   setWeatherAlert(null);
+        // }
       } catch (error) {
         console.error('Error fetching weather data:', error);
+        setError("Could not fetch weather data. Please try again later.");
       }
     };
 
@@ -112,7 +118,7 @@ const WeatherBot = () => {
 
   
   return (
-    <div className="h-screen bg-gray-900 bg-gradient-to-r from-gray-900 to-black-800 text-white p-8 overflow-hidden">
+    <div className="h-screen bg-gray-900 bg-gradient-to-r from-gray-900 to-black-800 text-white p-8 overflow-auto">
       {/* Green Glows */}
     <div className="absolute bottom-5 left-60 w-40 h-56 rounded-full bg-green-700 opacity-75 blur-3xl z-10"></div>
       <div className="absolute top-10 right-16 w-40 h-40 rounded-full bg-green-500/80 opacity-81 blur-3xl"></div>
@@ -123,27 +129,28 @@ const WeatherBot = () => {
           <div className="bg-gray-700/80 backdrop-blur-lg rounded-2xl p-4 w-full">
             <div className="flex items-center justify-center">
               <WeatherIcon  type={weatherData?.currentCondition || 'cloudy'} />
-              <h2 className="text-4xl font-bold absolute bottom-0 ">{weatherData?.temperature || '25'}°C</h2>
+              <h2 className="text-4xl font-bold absolute bottom-1 ">{weatherData?.temperature || '25'}°C</h2>
 
             </div>
            
           </div>
           <div className="mt-1 w-full">
-          <p className="text-gray-400 mt-1 text-center">{weatherData?.description || 'Cloudy with chances of rain'}</p>
-            <h2 className="text-xl font-bold mb-2 text-center">Safety Recommendations</h2>
+          <p className="text-gray-400 mt-2 text-center mb-2">{weatherData?.trend || 'Cloudy with chances of rain'}</p>
+            <h2 className="text-xl font-bold mb-2 text-center mt-3">Safety Recommendations</h2>
             <ul className="space-y-2 justify-center text-center text-md">
-              <li>• Check for proper ventilation and air quality</li>
-              <li>• Ensure all electrical equipment is functioning correctly</li>
-              <li>• Monitor ground stability and roof conditions</li>
-              <li>• Provide adequate lighting for all work areas</li>
-            </ul>
+            {weatherData?.precautions?.map((precaution, index) => (
+              <li key={index}>{precaution}</li>
+            )) || <li>No precautions available</li>}
+              </ul>
+
           </div>
           </GlassCard>
         {/* </div> */}
          {/* Graph Section */}
         {/* <div className="bg-gray-800/80 backdrop-blur-lg rounded-2xl pr-9 pt-14 space-y-14  border-x-2 border-green-700"> */}
          <GlassCard> 
-         <div className="pr-9 pt-14 space-y-14  "> 
+         <div className="pr-9 pt-14 space-y-14 "> 
+         <h2 className="text-xl font-bold text-center -mt-8 -mb-8">{weatherData?.city || 'NIL'}</h2>
           {/* Temperature Graph */}
           <ResponsiveContainer width="100%" height={150}>
             <LineChart data={temperatureData}>
@@ -183,10 +190,14 @@ const WeatherBot = () => {
         </div>
       )} */}
 <div className="mt-6 flex justify-center items-center">
-  <Alert severity="error">
-    <AlertTitle>Weather Alert</AlertTitle>
+  <Alert severity={weatherData?.severity || "High"}>
+    <AlertTitle>Weather Severity: {weatherData?.severity || 'High'}</AlertTitle>
     <AlertDescription>
-    Current weather conditions are severe with high winds, low temperatures, and high humidity. Suspend all non-essential outdoor operations and ensure workers are in a safe, sheltered environment.
+    <ul className="space-y-2 text-md">
+            {weatherData?.insights?.map((insight, index) => (
+              <li key={index}>{insight}</li>
+            )) || <li>No insights available</li>}
+    </ul>
     </AlertDescription>
   </Alert>
 </div>

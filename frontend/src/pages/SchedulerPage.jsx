@@ -14,45 +14,22 @@ import 'react-time-picker/dist/TimePicker.css';
 import 'react-clock/dist/Clock.css';
 import {SelectField } from '../components/InputFields';
 import axios from 'axios';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import moment from 'moment-timezone';
 
-// Simulated user data - In a real app, this would come from an API or context
-// const mockUsers = [
-//   { 
-//     id: 1, 
-//     name: 'John Smith', 
-//     role: 'Shift Incharge', 
-//     department: 'Morning Shift' 
-//   },
-//   { 
-//     id: 2, 
-//     name: 'Sarah Williams', 
-//     role: 'Shift Incharge', 
-//     department: 'Extraction Team' 
-//   },
-//   { 
-//     id: 3, 
-//     name: 'Mike Rodriguez', 
-//     role: 'Shift Incharge', 
-//     department: 'Night Shift' 
-//   },
-//   { 
-//     id: 4, 
-//     name: 'Emily Chen', 
-//     role: 'Shift Incharge', 
-//     department: 'Safety Monitoring' 
-//   }
-// ];
 
 const SchedulerPage = () => {
   const [users, setUsers] = useState([]);
+  // const [teams, setTeams] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState({
     title: '',
-    shiftIncharge: '',
-    shiftInchargeId: null,
+    allottedTo: '',
+    allottedToId: null,
     priority: 'medium',
     description: '',
-    startTime: '00:00',
+    endDate: '',
     endTime: '00:00',
   });
 
@@ -71,59 +48,45 @@ const SchedulerPage = () => {
     findUsers();
   }, []);
 
-  const addTask = async () => {
+
+const addTask = async () => {
     // Validation
-    if (!newTask.title || !newTask.shiftIncharge) {
+    if (!newTask.title || !newTask.allottedTo) {
       alert('Please fill in all required fields');
       return;
     }
-  
-    // Validate time
-    if (newTask.startTime >= newTask.endTime) {
-      alert('End time must be after start time');
+
+    if (!newTask.endDate || !newTask.endTime) {
+      alert('Please select both an end date and time');
       return;
     }
-  
-    // const today = new Date();
 
-    // // Get current date in local time without time zone adjustments
-    // const currentDate = today.toLocaleDateString('en-GB'); // Use 'en-GB' for a consistent DD/MM/YYYY format
+    // Combine date and time in IST as a moment object
+    let endDateTimeIST = moment.tz(
+      `${newTask.endDate}T${newTask.endTime}`,
+      "Asia/Kolkata"
+    );
+
+    // Validate time: Check if end time is in the past
+    if (endDateTimeIST.isBefore(moment())) {
+      alert('End time must be after the current time');
+      console.log('Current Time:', moment().toISOString());
+      console.log('End Time:', endDateTimeIST.toISOString());
+      return;
+    }
+
+    endDateTimeIST = moment.tz(
+      `${moment(newTask.endDate).format('YYYY-MM-DD')}T${newTask.endTime}`,
+      "Asia/Kolkata"
+    ).toISOString();
     
-    // // Format current date with local timezone
-    // const localDate = new Date(`${currentDate} ${newTask.startTime}`);
-    // const localEndDate = new Date(`${currentDate} ${newTask.endTime}`);
-    
-    // // Adjust the time to retain the correct local time
-    // const startDateTime = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000);
-    // const endDateTime = new Date(localEndDate.getTime() - localEndDate.getTimezoneOffset() * 60000);
-
-    const today = new Date();
-
-// Get current date in ISO format (YYYY-MM-DD)
-const currentDateISO = today.toISOString().split('T')[0]; // This gives the date in YYYY-MM-DD
-
-// Combine the ISO date with the user-entered time to create a timestamp
-const localStartDateTime = new Date(`${currentDateISO}T${newTask.startTime}:00`);
-const localEndDateTime = new Date(`${currentDateISO}T${newTask.endTime}:00`);
-
-// Adjust the time to match local time (optional if needed for specific use cases)
-const startDateTime = new Date(localStartDateTime.getTime());
-const endDateTime = new Date(localEndDateTime.getTime());
-// const startDateTime = new Date(localStartDateTime.getTime() - localStartDateTime.getTimezoneOffset() * 60000);
-// const endDateTime = new Date(localEndDateTime.getTime() - localEndDateTime.getTimezoneOffset() * 60000);
-
-// console.log('Start Date:', startDateTime.toISOString());
-// console.log('End Date:', endDateTime.toISOString());
-
-    
-    // Storing current time as createdAt
-    //const createdAt = new Date();
   
     try {
       const taskToAdd = {
         ...newTask,
-        startTime: startDateTime, // Store as Date object
-        endTime: endDateTime, // Store as Date object
+        // startTime: startDateTime, // Store as Date object
+        // endTime: endDateTime, // Store as Date object
+        end:endDateTimeIST,
         status: 'Pending',
         //createdAt, // MongoDB will automatically store it as Date
       };
@@ -138,17 +101,18 @@ const endDateTime = new Date(localEndDateTime.getTime());
         console.log('Task added successfully');
   
         // Update tasks state with the new task
-        setTasks([...tasks, response.data]);
+        //setTasks((prevTasks) => [...prevTasks, response.data]);
+        setOrders((prevOrders) => [...prevOrders, response.data]);
         //setOrders([...orders, response.data]);
   
         // Reset form
         setNewTask({
           title: '',
-          shiftIncharge: '',
-          shiftInchargeId: null,
+          allottedTo: '',
+          allottedToId: null,
           priority: 'medium',
           description: '',
-          startTime: '00:00',
+          endDate: '',
           endTime: '00:00',
         });
       } else {
@@ -166,7 +130,7 @@ const endDateTime = new Date(localEndDateTime.getTime());
       try {
         const response = await axios.post('http://localhost:3000/scheduler/getTask');
         console.log('Response from backend:', response.data);
-        setOrders(response.data.workOrders || []); 
+        setOrders(response.data.modifiedWorkOrders || []); 
       } catch (error) {
         console.error('Error fetching data from backend:', error);
       }
@@ -175,22 +139,6 @@ const endDateTime = new Date(localEndDateTime.getTime());
     findworkOrders();
   }, []);
 
-  // useEffect(() => {
-  //   setOrders([
-  //     { _id: '1', title: 'Task 1', shiftIncharge: 'John', start: '10:00', end: '11:00', description: 'Description 1', priority: 'high', createdAt: '2024-12-01T10:00' },
-  //     { _id: '2', title: 'Task 2', shiftIncharge: 'Sarah', start: '12:00', end: '13:00', description: 'Description 2', priority: 'medium', createdAt: '2024-12-01T12:00' }
-  //   ]);
-  // }, []);
-  
-  
-  // useEffect(() => {
-  //   console.log("Orders state after fetch:", orders); // Add this log
-  // }, [orders]);
-
-  // useEffect(() => {
-  //   console.log("Orders state after fetch:", orders.length); // Add this log
-  // }, [orders]);
-  
   
 
   const handleShiftInchargeChange = (e) => {
@@ -199,18 +147,21 @@ const endDateTime = new Date(localEndDateTime.getTime());
   
     // Find the corresponding user object
     const selectedUser = users.find(
-      (user) => `${user.name} - ${user.department}` === selectedName
+      (user) => `${user.name}` === selectedName
+      // (user) => `${user.name} - ${user.department}` === selectedName
     );
   
     // Update the state with the selected user's name and ID
     if (selectedUser) {
       setNewTask((prev) => ({
         ...prev,
-        shiftIncharge: `${selectedUser.name} - ${selectedUser.department}`, // Set the name as the selected shift incharge
-        shiftInchargeId: selectedUser._id, // Set the corresponding ID for the shift incharge
+        allottedTo: `${selectedUser.name}`, // Set the name as the selected shift incharge
+        allottedToId: selectedUser._id, // Set the corresponding ID for the shift incharge
       }));
     }
   };
+
+  
   
 
   return (
@@ -247,39 +198,40 @@ const endDateTime = new Date(localEndDateTime.getTime());
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center">
           <Users className="mr-2 h-4 w-4 text-green-500" />
-          Shift Incharge
+          Task Allotted To
         </label>
         <SelectField
-          label="Select Shift Incharge"
-          name="shiftIncharge"
-          value={newTask.shiftIncharge}
+          label="Select receipent of Task"
+          name="allottedTo"
+          value={newTask.allottedTo}
           onChange={handleShiftInchargeChange}
-          options={users.map((user) => `${user.name} - ${user.department}`)}
+          options={users.map((user) => `${user.name}`)}
         />
       </div>
 
+
               {/* Time and Priority Inputs */}
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Start Time
-          </label>
-          <TimePicker
-            onChange={(value) => 
-              setNewTask({ 
-                ...newTask, 
-                startTime: value || '00:00' 
-              })
-            }
-            value={newTask.startTime}
-            className="w-auto bg-gray-700 border-gray-900 flex justify-between rounded-md"
-            disableClock={true}
-            clearIcon={null}
-          />
-        </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-2">
+          End Date
+        </label>
+        <DatePicker
+          selected={newTask.endDate ? new Date(newTask.endDate) : null} // Ensure the selected value is a proper Date object
+          onChange={(date) =>
+            setNewTask({
+              ...newTask,
+              endDate: new Date(date.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Add one day to the selected date
+            })
+          }
+          dateFormat="yyyy-MM-dd"
+          className="w-full bg-gray-700 text-white border-gray-900 rounded-md px-3 py-2"
+          placeholderText="Select End Date"
+        />
+      </div>
         <div>
           <label className="flex flex-col text-sm font-medium text-gray-300 mb-2">
-            End Time:
+            End Time
           </label>
           <TimePicker
             onChange={(value) => 
@@ -288,7 +240,8 @@ const endDateTime = new Date(localEndDateTime.getTime());
                 endTime: value || '00:00' 
               })
             }
-            value={newTask.endTime}
+            value={newTask.endTime || '00:00'}
+
             className="w-auto bg-gray-700 border-gray-900 flex justify-between rounded-md"
             disableClock={true}
             clearIcon={null}
@@ -358,7 +311,7 @@ const endDateTime = new Date(localEndDateTime.getTime());
                   <div>
                     <div className="font-medium text-white">{order.title}</div>
                     <div className="text-sm text-gray-400">
-                      {order.shiftIncharge} | {order.start} - {order.end}
+                      Allotted to: {order.allottedTo? order.allottedTo:'None'} | Due {order.end}
                     </div>
                     <p className="text-xs text-gray-500 mt-1">{order.description}</p>
                   </div>
@@ -376,8 +329,22 @@ const endDateTime = new Date(localEndDateTime.getTime());
                       {order.priority ? order.priority.toUpperCase() : "N/A"}
                     </span>
                     <div className="flex items-center space-x-1 text-gray-300">
-                      <Clock className="w-4 h-4" />
-                      <span className="text-xs">{order.createdAt}</span>
+                      <Clock className="w-4 h-4 mr-2" />
+                      {/* <span className="text-xs">{order.createdAt}</span> */}
+                      <span
+                      className={`px-3 py-1 rounded-full text-xs font-bold 
+                      ${
+                        order.status === "Past Due"
+                          ? "bg-red-600/20 text-red-400"
+                          : order.status === "Completed"
+                          ? "bg-blue-600/20 text-blue-400"
+                          : order.status ==='In Progress'
+                          ? "bg-green-600/20 text-green-400"
+                          : "bg-yellow-600/20 text-yellow-400"
+                      }`}
+                    >
+                      {order.status ? order.status.toUpperCase() : "N/A"}
+                    </span>
                     </div>
                   </div>
                 </div>

@@ -1,0 +1,449 @@
+.sensor-health-card {
+    background-color: #1c1c1c; /* Dark gray background */
+    color: white; /* White text */
+    width: 250px; /* Fixed width */
+    padding: 20px; /* Inner spacing */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+    font-family: "Arial", sans-serif;
+    margin-top: '1rem';
+  }
+  
+  .sensor-health-header {
+    display: flex;
+    align-items: center;
+    font-size: 25px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    margin-top: -15px;
+  }
+  
+  .battery-icon {
+    margin-right: 8px; /* Space between icon and text */
+    font-size: 18px;
+  }
+  
+  .sensor-health-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Spacing between rows */
+  }
+  
+  .sensor-stat-row {
+    display: flex;
+    justify-content: space-between; /* Arrange items in a single row */
+    text-align: center; /* Center-align text */
+  }
+  
+  .label {
+    font-size: 30px; /* Font size for headings */
+    font-weight: 500;
+    flex: 1; /* Equal spacing for all columns */
+    text-align: center; /* Center-align each label */
+    margin-top: -15px;
+  }
+  
+  .value {
+    font-size: 30px; /* Larger font for numbers */
+    font-weight: bold;
+    flex: 1; /* Equal spacing for all columns */
+    text-align: center; /* Center-align each number */
+  }
+  
+  .green {
+    color: #00ff00; /* Bright green for Active */
+  }
+  
+  .red {
+    color: #ff0000; /* Bright red for Inactive */
+  }
+  
+
+
+  /* Global Container */
+/* .file-progress-container {
+  min-height: 20vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+ 
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+} */
+
+/* Main Frame Styles */
+.frem {
+  top: -3rem;
+  left: -5rem;
+  width: 28rem;
+  height: 91px;
+  /* margin-top: '-10rem'; */
+  /* box-shadow: 12px 11px 20px #0000000f; */
+  border-radius: 21px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0px 12px;
+  position: relative;
+  z-index: 10;
+}
+
+/* Logo Styles */
+/* .logo {
+  width: 62px;
+  height: 62px;
+  background: #fe8a91;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0px 0px 20px #fd4e864f;
+} */
+
+/* Title Styles */
+/* .title-p {
+  position: absolute;
+  margin-left: '5rem';
+  top: -1rem;
+  left: 20rem;
+  font-size: 21px;
+  font-family: cursive;
+  font-weight: 600;
+  color: #5a5a5a;
+  z-index: 200;
+} */
+
+/* File Size Styles */
+.size-file1 {
+  left: 5rem;
+  bottom: 5rem;
+  width: 16rem;
+  position: absolute;
+  right: 17px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.tons  {
+ margin-left: 18rem;
+  bottom:0rem;
+  font-size: 18px;
+  color: #ffffff;
+  font-family: cursive;
+  font-weight: 600;
+}
+
+/* Loading Bar Container */
+.loading {
+  position: absolute;
+  left: 5rem;
+  top: 67px;
+  display: flex;
+  align-items: center;
+}
+
+/* Loading Track */
+.loading-track {
+  width: 20rem;
+  height: 6px;
+  background: #b5b5b58c;
+  border-radius: 12px;
+  position: absolute;
+}
+
+/* Loading Bar */
+.loading-bar {
+  position: absolute;
+  width: 20rem;
+  height: 13px;
+  background: linear-gradient(90deg, #fecfc8, #fe818a);
+  border-radius: 23px;
+  animation: progressAnimation 3s forwards ease-in-out;
+}
+
+/* Progress Animation */
+@keyframes progressAnimation {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 20rem;
+  }
+}
+
+/* Confetti Container */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Confetti Styles */
+.confetti {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background-color: #f2d74e;
+  opacity: 1;
+  animation: confetti-blast ease-out forwards;
+}
+
+/* Confetti Blast Animation */
+@keyframes confetti-blast {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--blast-x), var(--blast-y)) rotate(var(--blast-rotate));
+    opacity: 0;
+  }
+}
+
+/* Completed Progress Bar */
+.loading-bar.completed {
+  background: green;
+}
+
+
+/* Title Styles */
+.title-p {
+ margin-top: 6px;
+  /* margin-left: 0; Align to the left */
+  font-size: 21px;
+  font-family: cursive;
+  font-weight: 600;
+  color: #5a5a5a;
+  /* margin-bottom: 0.5rem; Add spacing below the title */
+}
+
+/* Align Frem and Other Content to the Left */
+.file-progress-container {
+  display: flex;
+  flex-direction: column; /* Stack the progress and text */
+  align-items: flex-start; /* Align to the left */
+  gap: 1rem; /* Add space between items */
+}
+
+
+/* Add this CSS to style the new task list section */
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+list {
+  padding: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+select {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.25rem;
+}
+
+select:focus {
+  outline: none;
+  border-color: #f39c12;
+}
+
+
+/* fooooooooooooooooooooooooooooooooooooooterrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr */
+/* Footer container */
+.footer-container {
+  background: rgba(233, 234, 230, 0.17);  /* Same semi-transparent grey background as the other containers */
+  padding: 3rem;
+  color: white;
+  margin-top: 4rem;
+  border-top: 1px solid #444; /* Optional: Adds a subtle border to separate from the content */
+}
+
+/* Footer content layout */
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Left section of the footer (Links) */
+.footer-left {
+  display: flex;
+  justify-content: space-between;
+  width: 60%;
+  margin-left: 5rem;
+}
+
+/* Individual footer item */
+.footer-item {
+  flex: 1;
+}
+
+.footer-title1 {
+  margin-left: 5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.footer-title2 {
+  margin-left: 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+
+.footer-links {
+  list-style: none;
+  padding-left: 0;
+  margin-left: 5rem;
+  font-size: 1.25rem;
+}
+
+.footer-link {
+  
+  color: #bbb;
+  text-decoration: none;
+  font-size: 18px;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.footer-link:hover {
+  color: #8fc8f4;
+}
+
+/* Right section (App download) */
+.footer-right {
+  flex: 1;
+  text-align: center;
+}
+
+/* Download icons section */
+.footer-icons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.download-icon img {
+  width: 10rem;
+  transition: transform 0.3s ease;
+}
+
+.download-icon img:hover {
+  transform: scale(1.1);
+}
+
+/* dropdownnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn */
+
+/* Layout Dropdown Button */
+.layout-button {
+  margin-right: 1.5rem ;
+    background-color: #908f8f79; /* Dark background */
+    color: white; /* White text */
+    padding: 8px 16px; /* Padding for the button */
+    border: none; /* Remove default border */
+    border-radius: 8px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor */
+    font-size: 14px; /* Font size */
+    font-weight: bold; /* Bold text */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+  }
+  
+  .layout-button:hover {
+    background-color: #333333b5; /* Slightly lighter on hover */
+  }
+  
+  /* Dropdown Menu Container */
+  .layout-dropdown-menu {
+    position: absolute;
+    top: 100%; /* Align below the button */
+    right: 0; /* Align to the right */
+    background-color: #1c1c1c; /* Match button color */
+    border-radius: 8px; /* Rounded corners */
+    padding: 8px 0; /* Space inside the dropdown */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5); /* Shadow effect */
+    z-index: 100; /* Ensure it's above other elements */
+    min-width: 180px; /* Ensure enough space for options */
+  }
+  
+  /* Dropdown Items */
+  .layout-dropdown-item {
+    display: flex; /* Align icon and text */
+    align-items: center; /* Center vertically */
+    padding: 8px 12px; /* Padding for each item */
+    cursor: pointer; /* Pointer cursor */
+    font-size: 14px; /* Font size */
+    color: white; /* Text color */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+  }
+  
+  .layout-dropdown-item:hover {
+    background-color: #333; /* Highlight on hover */
+  }
+  
+  /* Layout Icon in Items */
+  .layout-icon {
+    margin-right: 8px; /* Space between icon and text */
+    font-size: 5px; /* Adjust icon size */
+  }
+  
+/* swapppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp */
+/* Default Layout */
+.content-container.Default {
+  display: flex;
+  gap: 16px;
+}
+
+.content-container.Default .graph-container,
+.content-container.Default .tasks-container,
+.content-container.Default .metrics-container {
+  flex: 1;
+}
+
+/* Swap Layout */
+.content-container.Swap {
+  display: flex;
+  flex-direction: column;
+}
+
+.content-container.Swap .metrics-container {
+  order: 1;
+}
+
+.content-container.Swap .graph-container {
+  order: 2;
+}
+
+.content-container.Swap .tasks-container {
+  order: 3;
+}
+
+/* Rows Layout */
+.content-container.Rows {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.content-container.Rows .graph-container,
+.content-container.Rows .tasks-container,
+.content-container.Rows .metrics-container {
+  flex: none;
+  width: 100%;
+}

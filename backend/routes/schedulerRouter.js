@@ -4,7 +4,8 @@ const mineManager=require('../models/mineManager');
 const shiftIncharge=require('../models/shiftIncharge');
 // const task=require('../models/taskModel');
 const job=require('../models/jobModel');
-const moment=require('moment');
+const moment=require('moment-timezone');
+const team = require('../models/teamModel');
 
 
 async function findUser(){
@@ -20,10 +21,28 @@ router.post("/",async(req,res)=>{
             mineManager:user,
     });
 
+    let teams=await team.find({
+      mineManager:user,
+    });
+    incharges=[...incharges,...teams];
     //console.log(incharges);
     res.json({
         incharges
     })
+
+});
+
+router.post("/getTeams",async(req,res)=>{
+  const user=await findUser();
+  //console.log(user);
+  let teams=await shiftIncharge.find({
+          mineManager:user,
+  });
+
+  //console.log(incharges);
+  res.json({
+      teams
+  })
 
 });
 
@@ -36,22 +55,40 @@ router.post("/addTask",async(req,res)=>{
     //const istDate = new Date(new Date().toLocaleString('en-US', options));
     // console.log(req.body.startTime.toLocaleString('en-US', options))
     // console.log(req.body.endTime.toLocaleString('en-US', options))
+    const endDateTimeIST = moment.tz(req.body.end, "Asia/Kolkata");
+    if (endDateTimeIST.isBefore(moment().tz("Asia/Kolkata"))) {
+      console.log(moment().tz("Asia/Kolkata"));
+      console.log(endDateTimeIST);
+    return res.status(400).json({ message: "End date/time must be in the future." });
+    }
     const job1=await job.create({
         title:req.body.title,
         description:req.body.description,
         priority:req.body.priority,
-        start:req.body.startTime,
-        end:req.body.endTime,
+        end:new Date(req.body.end),
         mineManager:user._id,
-        shiftIncharge:req.body.shiftInchargeId,
+        //shiftIncharge:req.body.shiftInchargeId,
     })
+    //
     // console.log(job1.createdAt.toLocaleString('en-US', options));
     // console.log(job1.end>Date.now());
     await user.job.push(job1._id);
     user.save();
-    const inch=await shiftIncharge.findById(job1.shiftIncharge);
-    await inch.job.push(job1._id);
-    inch.save();
+    const inch=await shiftIncharge.findById(req.body.allottedToId);
+    if(inch){
+      job1.shiftIncharge=inch._id;
+      await inch.job.push(job1._id);
+      await inch.save();
+    }
+    const temp=await team.findById(req.body.allottedToId);
+    if(temp){
+      job1.team=temp._id;
+      await temp.job.push(job1._id);
+      await temp.save();
+    }
+    // await inch.job.push(job1._id);
+    // inch.save();
+    await job1.save();
     res.status(200).json({message:'Sucess'});
 })
 
@@ -59,43 +96,59 @@ router.post("/getTask", async (req, res) => {
   try {
     const user = await findUser();
 
-    // Fetch work orders associated with the user
-    const startOfDay = moment().startOf('day').toDate(); // midnight of today
-    const endOfDay = moment().endOf('day').toDate(); // just before midnight (23:59:59)
-    // console.log(startOfDay);
-    // console.log(endOfDay);
-    // Fetch work orders associated with the user created today
+    // // Fetch work orders associated with the user created today
     let workOrders = await job.find({
       mineManager: user,
       // status: { $in: ["Pending", "In Progress"] },
-      createdAt: { $gte: startOfDay, $lt: endOfDay }, // Filter for today
+      //end: { $gte: startOfDay, $lt: endOfDay }, // Filter for today
     });
 
-    const modifiedWorkOrders = await Promise.all(
-      workOrders.map(async (work) => {
-        // Convert to plain object for modification without affecting the DB
-        const workObj = work.toObject();
+  const modifiedWorkOrders = await Promise.all(
+    workOrders.map(async (work) => {
+      // Update the status in the database if the condition is met
+      if (work.end < Date.now() && work.status!=='Completed') {
+        work.status = "Past Due";
+        await work.save(); // Persist the status change
+      }
 
-        // Fetch the name of the shift incharge
+      // Convert to plain object for modification without affecting the DB
+      const workObj = work.toObject();
+
+      // Fetch the name of the shift incharge
+      if(work.shiftIncharge!==null){
         const inch = await shiftIncharge.findById(work.shiftIncharge);
         if (inch) {
-          workObj.shiftIncharge = inch.name; // Replace ID with name in response
+          workObj.allottedTo = inch.name; // Replace ID with name in response
         }
+    }
 
-        // Format createdAt, start, and end fields as readable date-time strings with adjustment
-        const options = { timeZone: "Asia/Kolkata", hour12: true };
+      if(work.team!==null){
+        const temp=await team.findById(work.team);
+        if(team){
+          workObj.allottedTo=temp.name;
+        }
+    }
 
-        workObj.createdAt = workObj.createdAt.toLocaleString("en-IN", options);
-        workObj.start = workObj.start.toLocaleString("en-IN", options);
-        workObj.end = workObj.end.toLocaleString("en-IN", options);
+    if (!workObj.allottedTo) {
+      workObj.allottedTo = 'None'; // Set default value if neither is found
+    }
 
-        return workObj; // Return modified object for response
-      })
-    );
+
+      workObj.end= moment(work.end).tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm");
+
+      return workObj; // Return modified object for response
+    })
+  )
+
+  console.log(modifiedWorkOrders);
 
     // Send modified objects in response
     res.json({
-      workOrders: modifiedWorkOrders,
+      // modifiedWorkOrders: modifiedWorkOrders.map((order) => ({
+      //   // ...order._doc,
+      //   // end: moment(order.end).tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm"),
+      // })),
+      modifiedWorkOrders
     });
   } catch (error) {
     console.error("Error fetching work orders:", error);
